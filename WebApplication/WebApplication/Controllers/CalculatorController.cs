@@ -12,14 +12,50 @@ namespace WebApplication.Controllers
     public class CalculatorController : ControllerBase
     {
 
-        // GET: api/Calculator/5
-        [HttpGet("{firstNumber}/{secondNumber}")]
+        // GET: api/calculator/sum/10/4
+        [HttpGet("sum/{firstNumber}/{secondNumber}")]
         public IActionResult Sum(string firstNumber, string secondNumber)
         {
             if (IsNumeric(firstNumber) && IsNumeric(secondNumber))
             {
                 var sum = ConvertToDecimal(firstNumber) + ConvertToDecimal(secondNumber);
                 return Ok(sum.ToString());
+            }
+            return BadRequest("Invalid input");
+        }
+
+        // GET: api/calculator/subtraction/10/4
+        [HttpGet("subtraction/{firstNumber}/{secondNumber}")]
+        public IActionResult Subtraction(string firstNumber, string secondNumber)
+        {
+            if (IsNumeric(firstNumber) && IsNumeric(secondNumber))
+            {
+                var sub = ConvertToDecimal(firstNumber) - ConvertToDecimal(secondNumber);
+                return Ok(sub.ToString());
+            }
+            return BadRequest("Invalid input");
+        }
+
+        // GET: api/calculator/division/10/4
+        [HttpGet("division/{firstNumber}/{secondNumber}")]
+        public IActionResult Division(string firstNumber, string secondNumber)
+        {
+            if (IsNumeric(firstNumber) && IsNumeric(secondNumber))
+            {
+                var division = ConvertToDecimal(firstNumber) / ConvertToDecimal(secondNumber);
+                return Ok(division.ToString());
+            }
+            return BadRequest("Invalid input");
+        }
+
+        // GET: api/calculator/multiplication/10/4
+        [HttpGet("multiplication/{firstNumber}/{secondNumber}")]
+        public IActionResult Multiplication(string firstNumber, string secondNumber)
+        {
+            if (IsNumeric(firstNumber) && IsNumeric(secondNumber))
+            {
+                var multi = ConvertToDecimal(firstNumber) * ConvertToDecimal(secondNumber);
+                return Ok(multi.ToString());
             }
             return BadRequest("Invalid input");
         }
