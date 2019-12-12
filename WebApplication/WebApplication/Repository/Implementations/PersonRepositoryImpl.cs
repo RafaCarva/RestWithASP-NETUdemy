@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 using WebApplication.Model;
 using WebApplication.Model.Context;
 
-namespace WebApplication.Services.Implementations
+namespace WebApplication.Repository.Implementations
 {
-    public class PersonServiceImpl : IPersonService
+    public class PersonRepositoryImpl : IPersonRepository
     {
         private MySQLContext _context;
 
-        public PersonServiceImpl(MySQLContext context)
+        public PersonRepositoryImpl(MySQLContext context)
         {
             _context = context;
         }
@@ -53,8 +53,6 @@ namespace WebApplication.Services.Implementations
             return _context.Persons.ToList();
         }
 
-
-
         public Person FindById(long id)
         {
             return _context.Persons.SingleOrDefault(p => p.Id.Equals(id));
@@ -62,23 +60,26 @@ namespace WebApplication.Services.Implementations
 
         public Person Update(Person person)
         {
-            if (!Exist(person.Id)) return new Person();
+            if (!Exist(person.Id)) return null;
 
-            var result = _context.Persons.SingleOrDefault(p => p.Id.Equals(person.Id));
-
-            try
+            var result = _context.Persons.SingleOrDefault(b => b.Id == person.Id);
+            if (result != null)
             {
-                _context.Entry(result).CurrentValues.SetValues(person);
-                _context.SaveChanges();
+                try
+                {
+                    _context.Entry(result).CurrentValues.SetValues(person);
+                    _context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            
             return person;
         }
 
-        private bool Exist(long? id)
+        public bool Exist(long? id)
         {
             return _context.Persons.Any(p => p.Id.Equals(id));
         }

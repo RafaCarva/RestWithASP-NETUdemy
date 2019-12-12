@@ -11,30 +11,64 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using WebApplication.Model.Context;
-using WebApplication.Services.Implementations;
+using WebApplication.Business.Implementations;
+using WebApplication.Repository.Implementations;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace WebApplication
 {
     public class Startup
     {
-        public IConfiguration Configuration { get; }
+        private readonly ILogger _logger;
+        public IConfiguration _configuration { get; }
+        public IHostingEnvironment _environment { get; }
 
-        public Startup(IConfiguration configuration)
+        public Startup(
+            IConfiguration configuration,
+            IHostingEnvironment environment,
+            ILogger<Startup>logger
+            )
         {
-            Configuration = configuration;
+            _configuration = configuration;
+            _environment = environment;
+            _logger = logger;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             // DB connection
-            var connection = Configuration["MySqlConnection:MySqlConnectionString"];
-            services.AddDbContext<MySQLContext>(options => options.UseMySql(connection));
+            var connectionString = _configuration["MySqlConnection:MySqlConnectionString"];
+            services.AddDbContext<MySQLContext>(options => options.UseMySql(connectionString));
+
+            if (_environment.IsDevelopment())
+            {
+                try
+                {
+                    var evolveConnection = new MySql.Data.MySqlClient.MySqlConnection(connectionString);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogCritical("Database migration failed", ex);
+                    throw;
+                }
+            }
+            
+
+
 
             services.AddControllers();
 
+            // API Versioning
+            services.AddApiVersioning();
+
+            services.AddMvc();
+
+
+
             // Dependency Injection
-            services.AddScoped<IPersonService, PersonServiceImpl>();
+            services.AddScoped<IPersonBusiness, PersonBusinessImpl>();
+            services.AddScoped<IPersonRepository, PersonRepositoryImpl>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
