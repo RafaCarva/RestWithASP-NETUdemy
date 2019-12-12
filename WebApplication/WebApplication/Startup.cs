@@ -45,7 +45,7 @@ namespace WebApplication
             {
                 try
                 {
-                    var evolveConnection = new MySql.Data.MySqlClient.MySqlConnection(connectionString);
+                    var evolveConnection = new MySql.Data.MySqlClient.MySqlConnection(connectionString); 
                 }
                 catch (Exception ex)
                 {
